@@ -144,7 +144,11 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
 .doc-grid.is-collapsed .doc-nav{display:none;}
 .doc-grid.is-collapsed .doc-main{grid-column:span 9;}
 @media (max-width:1180px){.doc-rail{display:none;}.doc-main{grid-column:span 9;}.doc-grid.is-collapsed .doc-main{grid-column:span 12;}}
-@media (max-width:900px){.doc-nav{display:none;}.doc-main,.doc-grid.is-collapsed .doc-main{grid-column:span 12;}}
+/* collapse the 12 tracks too, not just the spans: twelve minmax(0,1fr)
+   columns plus an unchanged 32px gap resolve every track to 0 and size
+   .doc-main from the 11 gaps alone (11 × 32 = 352px), which overflowed
+   a 375px viewport. Same shape as the .search-grid collapse above. */
+@media (max-width:900px){.doc-grid{grid-template-columns:minmax(0,1fr);gap:0;}.doc-nav{display:none;}.doc-main,.doc-grid.is-collapsed .doc-main{grid-column:auto;}}
 .doc-sticky{position:sticky;top:132px;max-height:calc(100vh - 152px);min-width:0;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;scrollbar-width:thin;padding-bottom:12px;}
 .doc-sticky::-webkit-scrollbar{width:8px;}
 .doc-sticky::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:999px;}
@@ -175,6 +179,12 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
 .callout--tip{--c-edge:var(--warn);--c-bg:var(--warn-soft);}
 .callout p{margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-2);}
 .callout strong{display:block;margin-bottom:4px;font-size:13.5px;color:var(--ink);}
+/* the text column is a flex item, so without min-width:0 it refuses to
+   shrink below max-content — and callouts in docs routinely carry a
+   long unbreakable URL or endpoint in <code>, which then pushes the
+   page sideways on a narrow screen. */
+.callout > div{min-width:0;}
+.callout code{overflow-wrap:anywhere;}
 .doc-table{width:100%;border-collapse:separate;border-spacing:0;margin:22px 0;font-size:13.5px;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px var(--line);}
 .doc-table th{background:var(--deep);color:var(--on-dark);text-align:left;padding:11px 14px;font-weight:600;font-size:12.5px;}
 .doc-table td{padding:11px 14px;border-top:1px solid var(--line);color:var(--ink-2);vertical-align:top;background:var(--surface);}
@@ -266,6 +276,118 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
 .tip:hover::after,.tip:focus-visible::after{opacity:1;transform:translateX(-50%);}
 .tip--end::after{left:auto;right:0;transform:translateY(-4px);}
 .tip--end:hover::after,.tip--end:focus-visible::after{transform:none;}
+
+/* ── phones: one consolidated block ──────────────────────────────────
+   These override inline style attributes, so !important is required —
+   the same escape hatch the breakpoints above already use. Measured at
+   375px before this block: 76px of horizontal document overflow from
+   the masthead on 13 of 14 screens, and an article rail that crushed
+   the breadcrumb to zero width and then overlapped its wrapped text. */
+@media (max-width:760px){
+  /* masthead — tighter gutters, 44px targets, and the duplicate profile
+     entry dropped: the menu already reaches the profile, and its
+     bookmark glyph collides in meaning with the article Save control */
+  [data-hdr-row]{padding:0 16px !important;gap:10px !important;}
+  [data-hdr-actions]{gap:8px !important;}
+  [data-hdr-profile]{display:none !important;}
+  /* trim the lockup rather than drop it: at 375px — the most common
+     phone width — the wordmark only fits if the mark and type come
+     down a step. Below 360 it genuinely cannot share the row. */
+  [data-hdr-brand]{font-size:13.5px !important;gap:8px !important;}
+  [data-hdr-brand] > span:first-child{width:26px !important;height:26px !important;}
+  [data-hdr-brand] [data-lucide]{width:15px;height:15px;}
+  /* "Knowledge Hub" fits at 375 with no headroom left, so a portal that
+     rebrands to a longer name has to truncate rather than push the
+     action cluster off the edge. */
+  [data-hdr-word]{overflow:hidden;text-overflow:ellipsis;min-width:0;}
+  [data-hdr-actions] > button{width:44px !important;height:44px !important;}
+  [data-hdr-actions] > a{height:44px !important;padding:0 15px !important;}
+
+  /* catalog specimens render at a fixed demo scale (see .spec rules
+     above) — let the frame scroll rather than the document */
+  .spec__body{overflow-x:auto;}
+
+  /* touch targets — height only. min-height clamps the used height, so
+     it beats the inline height:36px/38px/40px without !important, and
+     leaving widths alone keeps the reflow risk at zero. Text links in
+     prose are left as-is (WCAG 2.5.8 exempts inline text links); the
+     catalog specimens opt out so they keep their demo scale. */
+  main button,main select,.sheet__panel button{min-height:44px;}
+  .spec button,.spec select,.spec a{min-height:0;}
+  .nav-dock__panel button{height:44px !important;}
+
+  /* prototype screen switcher: keep it inside the viewport */
+  .nav-dock{right:12px;bottom:12px;}
+  .nav-dock__btn{height:44px;width:44px;}
+  .nav-dock__btn > span:first-child{width:44px;height:44px;}
+  .nav-dock__panel{width:calc(100vw - 24px);max-width:340px;}
+  .nav-dock:hover .nav-dock__label,.nav-dock:focus-within .nav-dock__label,
+  .nav-dock.is-open .nav-dock__label{max-width:150px;}
+}
+
+/* ── 640 and below: the article header stops fitting on one row ──────
+   Measured: the rail needs ~330px and the breadcrumb ~200px, so with
+   56px of gutters the row breaks at about 600px. Kept separate from the
+   masthead block above so a 768px tablet, which has room for both on
+   one line, kicks none of this in. */
+@media (max-width:640px){
+  /* the rail wraps to two rows here, so the bar costs ~138px. Pinned
+     under the 68px masthead that is a quarter of an 812px screen held
+     permanently, so it scrolls away instead. Every control stays — see
+     the page-actions spec for the "More" sheet that would let it stay
+     pinned. Not overflow:auto on the rail: the copy-options menu is an
+     absolutely-positioned child and a scroll container would clip it. */
+  [data-art-bar]{position:static !important;}
+  [data-art-head]{flex-wrap:wrap !important;padding:8px 16px !important;gap:8px !important;}
+  /* the full trail wrapped to three lines at 375px. Collapse it to the
+     parent link only — a:last-of-type is the deepest ancestor link, so
+     this holds at any trail depth — and keep that link rather than
+     hiding the crumb outright, because .doc-nav is already
+     display:none below 900px and this is the only hierarchy cue left. */
+  [data-art-crumb]{width:100% !important;order:1 !important;flex-wrap:nowrap !important;
+                   min-width:0 !important;font-size:13px !important;}
+  [data-art-crumb] > *{display:none !important;}
+  [data-art-crumb] > a:last-of-type{display:inline-block !important;overflow:hidden;
+                   text-overflow:ellipsis;white-space:nowrap;max-width:100%;}
+  [data-art-crumb]::before{content:"\2039";margin-right:6px;color:var(--ink-3);
+                   font-size:16px;line-height:1;flex:none;}
+  [data-art-rail]{order:2 !important;width:100% !important;margin-left:0 !important;
+                  flex-wrap:wrap !important;justify-content:flex-start !important;}
+  [data-art-rail] > button{width:44px !important;height:44px !important;}
+  [data-art-copy]{height:44px !important;}
+
+  /* hero: 96px/88px of vertical padding plus a 34rem floor pushed the
+     first content section off an 812px phone screen on its own */
+  .photo--hero{min-height:0 !important;}
+  .photo--hero .photo__content{padding:52px 20px 56px !important;}
+  .photo--hero h1{font-size:34px !important;}
+}
+
+@media (max-width:480px){
+  /* card grids declare repeat(auto-fit,minmax(280–330px,1fr)) inline.
+     Once the 28px gutters come out of a 320px viewport only 264px is
+     left, so the minimum track won and the page scrolled sideways on
+     Home, What's New, API index and 404. Matching the inline
+     declaration by substring keeps this to one rule rather than nine
+     call-site edits; the durable fix is a --card-min token those grids
+     read from, which belongs with the type/radius scale work. */
+  main [style*="auto-fit"],main [style*="auto-fill"]{grid-template-columns:minmax(0,1fr) !important;}
+
+  /* two more max-content holdouts at 320px. A grid item under
+     place-items:center is sized by max-content and will not shrink
+     into its track, and the results toolbar is a nowrap flex row.
+     Both halves are needed on the 404: the implicit auto track sizes
+     to max-content too, so max-width:100% on the item alone resolves
+     against the oversized area and clamps nothing. */
+  [data-404-grid]{grid-template-columns:minmax(0,1fr) !important;}
+  [data-404-box]{max-width:100% !important;}
+  [data-sr-tools]{flex-wrap:wrap !important;margin-left:0 !important;}
+}
+
+@media (max-width:360px){
+  /* below this the wordmark and the action cluster cannot share a row */
+  [data-hdr-word]{display:none !important;}
+}
 </style>
 </helmet>
 
@@ -273,15 +395,15 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
 
 <sc-if value="{{ chrome }}" hint-placeholder-val="{{ true }}">
 <header style="position:sticky;top:0;z-index:50;background:rgba(250,249,247,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);">
-  <div style="max-width:1240px;margin:0 auto;padding:0 28px;height:68px;display:flex;align-items:center;gap:22px;">
-    <a onClick="{{ goHome }}" style="display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-size:14.5px;font-weight:600;letter-spacing:-.015em;cursor:pointer;white-space:nowrap;flex:none;"><span style="width:30px;height:30px;border-radius:9px;background:var(--deep);color:#fff;display:grid;place-items:center;"><i data-lucide="layers"></i></span>Knowledge Hub</a>
+  <div data-hdr-row style="max-width:1240px;margin:0 auto;padding:0 28px;height:68px;display:flex;align-items:center;gap:22px;">
+    <a onClick="{{ goHome }}" data-hdr-brand style="display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-size:14.5px;font-weight:600;letter-spacing:-.015em;cursor:pointer;white-space:nowrap;flex:none;min-width:0;"><span style="width:30px;height:30px;border-radius:9px;background:var(--deep);color:#fff;display:grid;place-items:center;flex:none;"><i data-lucide="layers"></i></span><span data-hdr-word>Knowledge Hub</span></a>
     <nav style="display:flex;gap:2px;margin-left:12px;min-width:0;overflow:hidden;" data-nav>
       <sc-for list="{{ nav }}" as="n" hint-placeholder-count="4"><button onClick="{{ n.go }}" style="padding:9px 14px;border:0;border-radius:999px;background:{{ n.bg }};color:{{ n.color }};font-size:13.5px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:var(--field);">{{ n.label }}</button></sc-for>
     </nav>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <div data-hdr-actions style="margin-left:auto;display:flex;align-items:center;gap:10px;flex:none;">
       <button class="tip" data-tip="Search" aria-label="Search" style="width:40px;height:40px;border:0;background:var(--field);border-radius:999px;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;transition:background var(--dur-fast) ease;" style-hover="background:var(--line);color:var(--ink);"><i data-lucide="search"></i></button>
       <button onClick="{{ toggleDock }}" data-hdr-menu aria-label="Menu" style="width:40px;height:40px;border:0;background:var(--field);border-radius:999px;color:var(--ink-2);cursor:pointer;place-items:center;"><i data-lucide="menu"></i></button>
-      <button onClick="{{ goProfile }}" class="tip" data-tip="Your profile" aria-label="Your profile" style="width:40px;height:40px;border:0;background:var(--field);border-radius:999px;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;" style-hover="background:var(--line);color:var(--ink);"><i data-lucide="bookmark"></i></button>
+      <button onClick="{{ goProfile }}" class="tip" data-tip="Your profile" aria-label="Your profile" data-hdr-profile style="width:40px;height:40px;border:0;background:var(--field);border-radius:999px;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;" style-hover="background:var(--line);color:var(--ink);"><i data-lucide="bookmark"></i></button>
       <a onClick="{{ goSignin }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:999px;background:var(--deep);color:#fff;font-size:13.5px;font-weight:500;text-decoration:none;white-space:nowrap;flex:none;transition:background var(--dur-fast) ease;" style-hover="background:var(--accent);text-decoration:none;">Sign in<i data-lucide="arrow-right" style="width:15px;height:15px;"></i></a>
     </div>
   </div>
@@ -386,16 +508,16 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
 <sc-if value="{{ isArticle }}" hint-placeholder-val="{{ false }}">
 <main data-screen-label="Article" style="flex:1;background:var(--bg);">
 
-  <div style="position:sticky;top:68px;z-index:40;background:var(--surface);border-bottom:1px solid var(--line);">
-    <div style="max-width:1240px;margin:0 auto;padding:10px 28px;display:flex;align-items:center;gap:12px;">
-      <nav aria-label="Breadcrumb" style="display:flex;gap:7px;align-items:center;font-size:12.5px;color:var(--ink-3);min-width:0;flex-wrap:wrap;">
+  <div data-art-bar style="position:sticky;top:68px;z-index:40;background:var(--surface);border-bottom:1px solid var(--line);">
+    <div data-art-head style="max-width:1240px;margin:0 auto;padding:10px 28px;display:flex;align-items:center;gap:12px;">
+      <nav aria-label="Breadcrumb" data-art-crumb style="display:flex;gap:7px;align-items:center;font-size:12.5px;color:var(--ink-3);min-width:0;flex-wrap:wrap;">
         <a onClick="{{ goHome }}" style="cursor:pointer;color:var(--ink-2);">Home</a><i data-lucide="chevron-right" style="width:14px;height:14px;color:var(--line-2);"></i>
         <a onClick="{{ goExperience }}" style="cursor:pointer;color:var(--ink-2);">Ingeniux CMS</a><i data-lucide="chevron-right" style="width:14px;height:14px;color:var(--line-2);"></i>
         <a onClick="{{ goArticle }}" style="cursor:pointer;color:var(--ink-2);">Authoring Basics</a><i data-lucide="chevron-right" style="width:14px;height:14px;color:var(--line-2);"></i>
         <span style="color:var(--ink);font-weight:500;">Creating Pages</span>
       </nav>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex:none;position:relative;">
-        <div style="display:flex;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden;">
+      <div data-art-rail style="margin-left:auto;display:flex;align-items:center;gap:8px;flex:none;position:relative;">
+        <div data-art-copy style="display:flex;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden;">
           <button onClick="{{ copyPage }}" style="display:flex;align-items:center;gap:8px;padding:0 14px;border:0;background:none;color:var(--ink);font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background var(--dur-fast) ease;" style-hover="background:var(--field);"><i data-lucide="copy" style="width:15px;height:15px;"></i>{{ copyLabel }}</button>
           <button onClick="{{ toggleMenu }}" aria-label="More copy options" aria-haspopup="menu" style="width:32px;border:0;border-left:1px solid var(--line);background:none;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;" style-hover="background:var(--field);color:var(--ink);"><i data-lucide="chevron-down" style="width:14px;height:14px;"></i></button>
         </div>
@@ -630,7 +752,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;">
         <h1 style="margin:0;font-size:24px;line-height:1.2;letter-spacing:-.02em;font-weight:500;">Results for "{{ query }}"</h1>
         <span style="font-size:14px;color:var(--ink-3);">{{ resultCount }} results</span>
-        <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+        <div data-sr-tools style="margin-left:auto;display:flex;align-items:center;gap:10px;">
           <button onClick="{{ toggleFilters }}" class="filter-btn" style="align-items:center;gap:8px;height:44px;padding:0 18px;border:1px solid var(--line-2);background:var(--surface);border-radius:999px;font-size:13.5px;font-weight:500;color:var(--ink);cursor:pointer;white-space:nowrap;"><i data-lucide="sliders-horizontal" style="width:16px;height:16px;"></i>Filters<sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ true }}"><span style="min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--accent);color:#fff;font-size:11.5px;display:grid;place-items:center;">{{ filterCount }}</span></sc-if></button>
           <label style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);white-space:nowrap;">Sort
             <select style="height:40px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font-size:13px;padding:0 12px;cursor:pointer;font-family:inherit;"><option>Relevance</option><option>Newest</option><option>Most viewed</option></select>
@@ -1509,8 +1631,8 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
 
 <!-- ══════════ 404 ══════════ -->
 <sc-if value="{{ isNotFound }}" hint-placeholder-val="{{ false }}">
-<main data-screen-label="404" style="flex:1;display:grid;place-items:center;padding:var(--sec-y) 28px 88px;">
-  <div style="max-width:620px;text-align:center;">
+<main data-screen-label="404" data-404-grid style="flex:1;display:grid;place-items:center;padding:var(--sec-y) 28px 88px;">
+  <div data-404-box style="max-width:620px;text-align:center;">
     <span style="display:inline-grid;place-items:center;width:72px;height:72px;border-radius:999px;background:var(--field);color:var(--ink-3);margin-bottom:22px;"><i data-lucide="file-question" style="width:28px;height:28px;"></i></span>
     <p style="margin:0 0 12px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;">404 · Page not found</p>
     <h1 style="margin:0 0 14px;font-size:30px;line-height:1.15;letter-spacing:-.024em;font-weight:500;">This page moved, was renamed, or never existed.</h1>

@@ -51,12 +51,31 @@ Runtime tweaks (accent, density, hero curve, grouping label, motion, elevation) 
 
 - Visible focus rings on every interactive element (`:focus-visible`, accent-colored).
 - `prefers-reduced-motion` zeroes all durations and hover transforms in a single rule.
-- 44px minimum touch targets on mobile controls.
+- 44px minimum touch targets below 760px on buttons, selects and the screen switcher. Text links inside prose keep their type size (WCAG 2.5.8 exempts inline text links).
 - Semantic landmarks, real heading order, `aria-label` on icon-only controls, `aria-current` on active nav.
 
 ## Responsive
 
-Breakpoints: 1280 (API code column drops), 1180 (article right rail hides), 1100 (header nav collapses to a menu), 980 (support pane unpins), 900 (side nav hides, facets become a sheet), 860 (photo mask off).
+Verified with no horizontal page overflow and no text collisions on all 14 screens at 320, 375, 414, 768, 1024, 1280 and 1440.
+
+Breakpoints, widest first:
+
+| Width | What changes |
+| --- | --- |
+| 1280 | API code column drops |
+| 1180 | Article right rail hides; API reference splits to one column |
+| 1100 | Header nav collapses to a menu |
+| 1000 | Solution deck stacks |
+| 980 | Support pane unpins |
+| 900 | Side nav hides, facets become a sheet, `.doc-grid` collapses to one column, API keys table drops its head row |
+| 860 | Photo mask off; pinned release stacks |
+| 820 | Playground splits to one column |
+| 760 | Masthead compresses: 16px gutters, 44px targets, lockup trims, duplicate profile button hides. Interactive heights raise to a 44px minimum |
+| 640 | Article header stacks: breadcrumb collapses to the parent link, action rail wraps to its own row, the bar unpins. Hero padding and h1 come down |
+| 480 | Card grids collapse to one column; 404 and results toolbar stop being sized by max-content |
+| 360 | Masthead wordmark hides, leaving the mark |
+
+Two notes for anyone extending this. Collapsing a multi-column grid means overriding `grid-template-columns` **and** the `gap`, not just the child spans — twelve `minmax(0,1fr)` tracks with a 32px gap left standing resolve every track to 0 and size the row from the gaps alone. And because layout is carried by inline `style` attributes rather than classes, the small-screen rules need `!important` to win; the `data-*` hooks on the masthead, article header and 404 exist so those overrides have something stable to target.
 
 ## Icons
 
