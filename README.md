@@ -1,5 +1,7 @@
 # CDP Standard Template Library
 
+**Live templates: https://davidjhillis.github.io/cdp_stl/**
+
 Standard content-delivery-platform templates for Ingeniux documentation portals.
 One self-contained file: open `index.html` in a browser — no build step, no package manager.
 
