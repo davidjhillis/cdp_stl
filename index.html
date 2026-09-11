@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knowledge Hub — CDP Standard Template Library</title>
+<meta name="description" content="Standard content-delivery-platform templates for Ingeniux documentation portals.">
 <script src="./support.js"></script>
 </head>
 <body>
@@ -17,7 +19,11 @@ body{
   /* surfaces */
   --bg:#FAF9F7;--surface:#FFFFFF;--field:#F2F0EC;--line:#E7E4DE;--line-2:#D4D0C8;
   /* ink */
-  --ink:#1E1D1B;--ink-2:#5C5A55;--ink-3:#8E8B84;--on-dark:#FFFFFF;--on-dark-2:#C9D2CE;
+  /* --ink-3 was #8E8B84, which measured 2.99:1 on --field and 3.40:1 on
+     --surface — a WCAG AA failure on the eyebrows, breadcrumbs, meta
+     lines and result counts that use it at 11-13px. #6E6B64 clears
+     4.5:1 against all three neutral surfaces. */
+  --ink:#1E1D1B;--ink-2:#5C5A55;--ink-3:#6E6B64;--on-dark:#FFFFFF;--on-dark-2:#C9D2CE;
   /* brand */
   --deep:#17352E;--accent:#2F5D50;--accent-2:#3E7A69;--accent-soft:#E4EEEA;
   /* status */
@@ -43,6 +49,11 @@ a{color:var(--accent);text-decoration:none;}a:hover{color:var(--accent-2);text-d
 button{font-family:inherit;}
 [data-lucide]{width:18px;height:18px;stroke-width:1.5;}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px;}
+/* skip link — off-screen until focused, then pinned over the masthead */
+.skip{position:fixed;top:8px;left:8px;z-index:100;transform:translateY(-200%);
+  padding:10px 16px;border-radius:var(--r-btn);background:var(--deep);color:var(--on-dark);
+  font-size:13.5px;font-weight:500;text-decoration:none;transition:transform var(--dur) var(--ease-out);}
+.skip:focus{transform:translateY(0);text-decoration:none;color:var(--on-dark);}
 
 /* ── hub-card chassis (ported from 3DS brand.css) ─────────────────────
    Flat field, 12px radius, 20/30 padding, no border, no resting shadow.
@@ -393,6 +404,8 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
 
 <div style="min-height:100vh;display:flex;flex-direction:column;">
 
+<a class="skip" href="#main">Skip to content</a>
+
 <sc-if value="{{ chrome }}" hint-placeholder-val="{{ true }}">
 <header style="position:sticky;top:0;z-index:50;background:rgba(250,249,247,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);">
   <div data-hdr-row style="max-width:1240px;margin:0 auto;padding:0 28px;height:68px;display:flex;align-items:center;gap:22px;">
@@ -402,7 +415,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
     </nav>
     <div data-hdr-actions style="margin-left:auto;display:flex;align-items:center;gap:10px;flex:none;">
       <button class="tip" data-tip="Search" aria-label="Search" style="width:40px;height:40px;border:0;background:var(--field);border-radius:999px;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;transition:background var(--dur-fast) ease;" style-hover="background:var(--line);color:var(--ink);"><i data-lucide="search"></i></button>
-      <button onClick="{{ toggleDock }}" data-hdr-menu aria-label="Menu" style="width:40px;height:40px;border:0;background:var(--field);border-radius:999px;color:var(--ink-2);cursor:pointer;place-items:center;"><i data-lucide="menu"></i></button>
+      <button onClick="{{ toggleDock }}" data-hdr-menu aria-label="Menu" aria-haspopup="true" aria-expanded="{{ dockExpanded }}" style="width:40px;height:40px;border:0;background:var(--field);border-radius:999px;color:var(--ink-2);cursor:pointer;place-items:center;"><i data-lucide="menu"></i></button>
       <button onClick="{{ goProfile }}" class="tip" data-tip="Your profile" aria-label="Your profile" data-hdr-profile style="width:40px;height:40px;border:0;background:var(--field);border-radius:999px;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;" style-hover="background:var(--line);color:var(--ink);"><i data-lucide="bookmark"></i></button>
       <a onClick="{{ goSignin }}" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:999px;background:var(--deep);color:#fff;font-size:13.5px;font-weight:500;text-decoration:none;white-space:nowrap;flex:none;transition:background var(--dur-fast) ease;" style-hover="background:var(--accent);text-decoration:none;">Sign in<i data-lucide="arrow-right" style="width:15px;height:15px;"></i></a>
     </div>
@@ -424,7 +437,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
         <p style="margin:0 0 32px;font-size:16px;line-height:1.6;color:var(--on-dark-2);max-width:520px;text-wrap:pretty;">Technical documentation, release news and how-to guidance for every product — searchable by you, readable by your agents.</p>
         <form onSubmit="{{ submitSearch }}" style="display:flex;align-items:center;gap:12px;height:60px;padding:0 8px 0 22px;border-radius:999px;background:var(--surface);max-width:560px;box-shadow:0 24px 48px -28px rgba(0,0,0,.5);">
           <i data-lucide="search" style="color:var(--ink-3);flex:none;"></i>
-          <input value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search or ask a question" style="flex:1;min-width:0;border:0;background:none;outline:none;font-size:14.5px;color:var(--ink);font-family:inherit;">
+          <input value="{{ query }}" onChange="{{ setQuery }}" type="search" name="q" aria-label="Search the documentation" placeholder="Search or ask a question" style="flex:1;min-width:0;border:0;background:none;outline:none;font-size:14.5px;color:var(--ink);font-family:inherit;">
           <button type="submit" style="height:44px;padding:0 22px;border:0;border-radius:999px;background:var(--deep);color:#fff;font-size:13.5px;font-weight:500;cursor:pointer;">Search</button>
         </form>
         <sc-if value="{{ filtersOpen }}" hint-placeholder-val="{{ false }}">
@@ -519,7 +532,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
       <div data-art-rail style="margin-left:auto;display:flex;align-items:center;gap:8px;flex:none;position:relative;">
         <div data-art-copy style="display:flex;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden;">
           <button onClick="{{ copyPage }}" style="display:flex;align-items:center;gap:8px;padding:0 14px;border:0;background:none;color:var(--ink);font-size:12.5px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background var(--dur-fast) ease;" style-hover="background:var(--field);"><i data-lucide="copy" style="width:15px;height:15px;"></i>{{ copyLabel }}</button>
-          <button onClick="{{ toggleMenu }}" aria-label="More copy options" aria-haspopup="menu" style="width:32px;border:0;border-left:1px solid var(--line);background:none;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;" style-hover="background:var(--field);color:var(--ink);"><i data-lucide="chevron-down" style="width:14px;height:14px;"></i></button>
+          <button onClick="{{ toggleMenu }}" aria-label="More copy options" aria-haspopup="menu" aria-expanded="{{ menuExpanded }}" style="width:32px;border:0;border-left:1px solid var(--line);background:none;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;" style-hover="background:var(--field);color:var(--ink);"><i data-lucide="chevron-down" style="width:14px;height:14px;"></i></button>
         </div>
         <button class="tip tip--end" data-tip="Download as PDF" aria-label="Download PDF" style="width:36px;height:36px;border:1px solid var(--line);background:var(--surface);border-radius:10px;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;transition:border-color var(--dur-fast) ease,color var(--dur-fast) ease;" style-hover="border-color:var(--accent);color:var(--accent);"><i data-lucide="file-down" style="width:16px;height:16px;"></i></button>
         <button class="tip tip--end" data-tip="Print this article" aria-label="Print" style="width:36px;height:36px;border:1px solid var(--line);background:var(--surface);border-radius:10px;color:var(--ink-2);cursor:pointer;display:grid;place-items:center;transition:border-color var(--dur-fast) ease,color var(--dur-fast) ease;" style-hover="border-color:var(--accent);color:var(--accent);"><i data-lucide="printer" style="width:16px;height:16px;"></i></button>
@@ -624,7 +637,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
         <div class="callout callout--tip"><i data-lucide="lightbulb" style="color:var(--warn);flex:none;margin-top:2px;"></i><div><strong>Tip</strong><p>Name pages by their reader-facing title, not their internal purpose — the name becomes the URL segment and the default breadcrumb label.</p></div></div>
         <h2 id="reserved">Reserved characters</h2>
         <p>The following characters are rejected in folder, page, component, and asset names:</p>
-        <table class="doc-table"><thead><tr><th>Character</th><th>Why it is reserved</th><th>Use instead</th></tr></thead><tbody>
+        <table class="doc-table"><thead><tr><th scope="col">Character</th><th scope="col">Why it is reserved</th><th scope="col">Use instead</th></tr></thead><tbody>
           <tr><td><code>/</code> <code>\</code></td><td>Path separators in the published URL</td><td>Hyphen</td></tr>
           <tr><td><code>?</code> <code>#</code> <code>&amp;</code></td><td>Query string and fragment delimiters</td><td>Omit</td></tr>
           <tr><td><code>%</code> <code>$</code> <code>^</code></td><td>Escape sequences in URL encoding</td><td>Spell the word</td></tr>
@@ -712,7 +725,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
                 <textarea rows="4" required placeholder="What did you like, and what could we improve?" style="border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;font-size:13.5px;font-family:inherit;color:var(--ink);background:var(--surface);outline:none;resize:vertical;font-weight:400;" style-focus="border-color:var(--accent);"></textarea>
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:600;color:var(--ink);">Your email <span style="font-weight:400;color:var(--ink-3);">optional</span>
-                <input type="email" placeholder="you@company.com" style="height:44px;border:1px solid var(--line-2);border-radius:12px;padding:0 14px;font-size:13.5px;font-family:inherit;color:var(--ink);background:var(--surface);outline:none;font-weight:400;" style-focus="border-color:var(--accent);">
+                <input type="email" name="email" autocomplete="email" aria-label="Your email (optional)" placeholder="you@company.com" style="height:44px;border:1px solid var(--line-2);border-radius:12px;padding:0 14px;font-size:13.5px;font-family:inherit;color:var(--ink);background:var(--surface);outline:none;font-weight:400;" style-focus="border-color:var(--accent);">
               </label>
             </div>
             <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 26px;background:var(--field);border-top:1px solid var(--line);">
@@ -738,7 +751,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
 <main data-screen-label="Search results" style="flex:1;max-width:1240px;margin:0 auto;width:100%;box-sizing:border-box;padding:32px 28px 88px;">
   <form onSubmit="{{ submitSearch }}" style="display:flex;align-items:center;gap:12px;height:56px;padding:0 8px 0 22px;border-radius:999px;background:var(--surface);border:1px solid var(--line);margin-bottom:28px;">
     <i data-lucide="search" style="color:var(--ink-3);flex:none;"></i>
-    <input value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search or ask a question" style="flex:1;min-width:0;border:0;background:none;outline:none;font-size:14.5px;color:var(--ink);font-family:inherit;">
+    <input value="{{ query }}" onChange="{{ setQuery }}" type="search" name="q" aria-label="Search the documentation" placeholder="Search or ask a question" style="flex:1;min-width:0;border:0;background:none;outline:none;font-size:14.5px;color:var(--ink);font-family:inherit;">
     <button type="button" onClick="{{ clearQuery }}" aria-label="Clear" style="width:40px;height:40px;border:0;background:none;color:var(--ink-3);cursor:pointer;border-radius:999px;display:grid;place-items:center;" style-hover="background:var(--field);"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
   </form>
   <div class="search-grid">
@@ -751,9 +764,9 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
     <div style="min-width:0;">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px;">
         <h1 style="margin:0;font-size:24px;line-height:1.2;letter-spacing:-.02em;font-weight:500;">Results for "{{ query }}"</h1>
-        <span style="font-size:14px;color:var(--ink-3);">{{ resultCount }} results</span>
+        <span role="status" aria-live="polite" style="font-size:14px;color:var(--ink-3);">{{ resultCount }} results</span>
         <div data-sr-tools style="margin-left:auto;display:flex;align-items:center;gap:10px;">
-          <button onClick="{{ toggleFilters }}" class="filter-btn" style="align-items:center;gap:8px;height:44px;padding:0 18px;border:1px solid var(--line-2);background:var(--surface);border-radius:999px;font-size:13.5px;font-weight:500;color:var(--ink);cursor:pointer;white-space:nowrap;"><i data-lucide="sliders-horizontal" style="width:16px;height:16px;"></i>Filters<sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ true }}"><span style="min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--accent);color:#fff;font-size:11.5px;display:grid;place-items:center;">{{ filterCount }}</span></sc-if></button>
+          <button onClick="{{ toggleFilters }}" class="filter-btn" aria-haspopup="dialog" aria-expanded="{{ filtersExpanded }}" style="align-items:center;gap:8px;height:44px;padding:0 18px;border:1px solid var(--line-2);background:var(--surface);border-radius:999px;font-size:13.5px;font-weight:500;color:var(--ink);cursor:pointer;white-space:nowrap;"><i data-lucide="sliders-horizontal" style="width:16px;height:16px;"></i>Filters<sc-if value="{{ hasFilters }}" hint-placeholder-val="{{ true }}"><span style="min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--accent);color:#fff;font-size:11.5px;display:grid;place-items:center;">{{ filterCount }}</span></sc-if></button>
           <label style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);white-space:nowrap;">Sort
             <select style="height:40px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font-size:13px;padding:0 12px;cursor:pointer;font-family:inherit;"><option>Relevance</option><option>Newest</option><option>Most viewed</option></select>
           </label>
@@ -766,7 +779,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
         </div>
       </sc-if>
 
-      <section style="background:var(--surface);border-radius:20px;padding:26px 30px;margin-bottom:24px;box-shadow:0 0 0 1px var(--line);">
+      <section aria-label="AI answer" aria-live="polite" style="background:var(--surface);border-radius:20px;padding:26px 30px;margin-bottom:24px;box-shadow:0 0 0 1px var(--line);">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:18px;">
           <span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;"><span style="width:26px;height:26px;border-radius:999px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;"><i data-lucide="sparkles" style="width:15px;height:15px;"></i></span>AI answer</span>
           <div style="display:flex;gap:6px;align-items:center;"><span style="font-size:12.5px;color:var(--ink-3);">{{ aiVoteLabel }}</span><button onClick="{{ aiUp }}" aria-label="Helpful" style="width:34px;height:34px;border:1px solid var(--line);background:none;border-radius:999px;color:{{ aiUpColor }};cursor:pointer;display:grid;place-items:center;" style-hover="border-color:var(--accent);color:var(--accent);"><i data-lucide="thumbs-up" style="width:15px;height:15px;"></i></button><button onClick="{{ aiDown }}" aria-label="Not helpful" style="width:34px;height:34px;border:1px solid var(--line);background:none;border-radius:999px;color:{{ aiDownColor }};cursor:pointer;display:grid;place-items:center;" style-hover="border-color:var(--ink);color:var(--ink);"><i data-lucide="thumbs-down" style="width:15px;height:15px;"></i></button></div>
@@ -915,8 +928,8 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
         <button type="button" style="height:46px;border:1px solid var(--line-2);background:var(--surface);border-radius:12px;font-size:13.5px;font-weight:500;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:border-color var(--dur-fast) ease;" style-hover="border-color:var(--accent);"><i data-lucide="{{ p.icon }}" style="width:17px;height:17px;"></i>{{ p.label }}</button>
       </sc-for>
       <div style="display:flex;align-items:center;gap:12px;margin:4px 0;font-size:12px;color:var(--ink-3);"><span style="flex:1;height:1px;background:var(--line);"></span>or<span style="flex:1;height:1px;background:var(--line);"></span></div>
-      <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);">Work email<input type="email" placeholder="you@company.com" style="height:46px;border:1px solid var(--line-2);border-radius:12px;padding:0 14px;font-size:13.5px;font-family:inherit;color:var(--ink);background:var(--surface);outline:none;" style-focus="border-color:var(--accent);"></label>
-      <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);">Password<input type="password" placeholder="••••••••" style="height:46px;border:1px solid var(--line-2);border-radius:12px;padding:0 14px;font-size:13.5px;font-family:inherit;color:var(--ink);background:var(--surface);outline:none;" style-focus="border-color:var(--accent);"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);">Work email<input type="email" name="email" autocomplete="email" required inputmode="email" placeholder="you@company.com" style="height:46px;border:1px solid var(--line-2);border-radius:12px;padding:0 14px;font-size:13.5px;font-family:inherit;color:var(--ink);background:var(--surface);outline:none;" style-focus="border-color:var(--accent);"></label>
+      <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);">Password<input type="password" name="password" autocomplete="current-password" required placeholder="••••••••" style="height:46px;border:1px solid var(--line-2);border-radius:12px;padding:0 14px;font-size:13.5px;font-family:inherit;color:var(--ink);background:var(--surface);outline:none;" style-focus="border-color:var(--accent);"></label>
       <div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;"><label style="display:flex;align-items:center;gap:8px;color:var(--ink-2);cursor:pointer;"><input type="checkbox" checked style="width:16px;height:16px;accent-color:var(--accent);">Keep me signed in</label><a href="#">Forgot password?</a></div>
       <button type="submit" style="height:46px;border:0;border-radius:999px;background:var(--deep);color:#fff;font-size:13.5px;font-weight:500;cursor:pointer;margin-top:4px;">Sign in</button>
       <button type="button" onClick="{{ goHome }}" style="height:44px;border:0;background:none;color:var(--ink-2);font-size:13px;cursor:pointer;">Browse public docs instead →</button>
@@ -983,7 +996,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
   <div class="doc-grid">
     <aside class="doc-nav">
       <div class="doc-sticky">
-        <input placeholder="Filter endpoints…" style="width:100%;box-sizing:border-box;height:40px;border:1px solid var(--line-2);border-radius:10px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none;margin-bottom:16px;" style-focus="border-color:var(--accent);">
+        <input type="search" aria-label="Filter endpoints" placeholder="Filter endpoints…" style="width:100%;box-sizing:border-box;height:40px;border:1px solid var(--line-2);border-radius:10px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none;margin-bottom:16px;" style-focus="border-color:var(--accent);">
         <a onClick="{{ goApiIndex }}" style="display:block;padding:9px 14px;margin-bottom:10px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-size:13.5px;font-weight:600;cursor:pointer;text-decoration:none;">Introduction</a>
         <sc-for list="{{ apiGroups }}" as="g" hint-placeholder-count="4">
           <div style="margin-bottom:18px;">
@@ -1023,7 +1036,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
         <p>Generate keys on the <a onClick="{{ goKeys }}" style="cursor:pointer;">API keys</a> page in your dashboard. Keys are scoped by type; each type authenticates a different set of endpoints. Send the key as a bearer token:</p>
       </div>
       <div class="code"><div class="code__bar">Authorization header<button class="tip tip--end" data-tip="Copy" aria-label="Copy" style="margin-left:auto;border:0;background:none;color:var(--on-dark-2);cursor:pointer;display:grid;place-items:center;"><i data-lucide="copy" style="width:14px;height:14px;"></i></button></div><pre><span class="k">Authorization</span>: Bearer <span class="s">$TOKEN</span></pre></div>
-      <table class="doc-table"><thead><tr><th>Key type</th><th>Prefix</th><th>Use for</th></tr></thead><tbody>
+      <table class="doc-table"><thead><tr><th scope="col">Key type</th><th scope="col">Prefix</th><th scope="col">Use for</th></tr></thead><tbody>
         <sc-for list="{{ apiKeyTypes }}" as="k" hint-placeholder-count="3"><tr><td style="font-weight:500;color:var(--ink);">{{ k.type }}</td><td><code>{{ k.prefix }}</code></td><td>{{ k.use }}</td></tr></sc-for>
       </tbody></table>
       <div class="callout callout--tip"><i data-lucide="shield-alert" style="color:var(--warn);flex:none;margin-top:2px;"></i><div><strong>Server-side only</strong><p>Admin keys carry write scope across the whole site. Never embed one in client code — proxy through your own backend and store the key as an environment variable.</p></div></div>
@@ -1055,7 +1068,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
   <div class="api-grid">
     <aside>
       <div class="doc-sticky">
-        <input placeholder="Filter endpoints…" style="width:100%;box-sizing:border-box;height:40px;border:1px solid var(--line-2);border-radius:10px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none;margin-bottom:16px;" style-focus="border-color:var(--accent);">
+        <input type="search" aria-label="Filter endpoints" placeholder="Filter endpoints…" style="width:100%;box-sizing:border-box;height:40px;border:1px solid var(--line-2);border-radius:10px;padding:0 12px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none;margin-bottom:16px;" style-focus="border-color:var(--accent);">
         <sc-for list="{{ apiGroups }}" as="g" hint-placeholder-count="4">
           <div style="margin-bottom:18px;">
             <p style="margin:0 0 6px;padding:0 8px;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);">{{ g.title }}</p>
@@ -1309,7 +1322,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
       </article>
       <article class="spec">
         <div class="spec__bar"><h3>Table</h3><code>&lt;dcx-table&gt;</code></div>
-        <div class="spec__body"><table class="doc-table" style="margin:0;"><thead><tr><th>Character</th><th>Why reserved</th></tr></thead><tbody><tr><td><code>/</code></td><td>Path separator in the published URL</td></tr><tr><td><code>?</code></td><td>Query string delimiter</td></tr></tbody></table></div>
+        <div class="spec__body"><table class="doc-table" style="margin:0;"><thead><tr><th scope="col">Character</th><th scope="col">Why reserved</th></tr></thead><tbody><tr><td><code>/</code></td><td>Path separator in the published URL</td></tr><tr><td><code>?</code></td><td>Query string delimiter</td></tr></tbody></table></div>
         <div class="spec__props"><span class="cat-prop"><code>header</code>dark · light</span><span class="cat-prop"><code>zebra</code>true · false</span><span class="cat-prop"><code>sortable</code>true · false</span></div>
       </article>
       <article class="spec">
@@ -1371,9 +1384,9 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
           <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);">Name<input value="{{ newKeyName }}" onChange="{{ setKeyName }}" placeholder="CI publish runner" style="height:44px;border:1px solid var(--line-2);border-radius:10px;padding:0 12px;font-size:13.5px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none;" style-focus="border-color:var(--accent);"></label>
           <fieldset style="border:0;padding:0;margin:0;">
             <legend style="padding:0 0 8px;font-size:12.5px;color:var(--ink-2);">Key type</legend>
-            <div style="display:flex;flex-direction:column;gap:8px;">
+            <div role="group" aria-label="Key type" style="display:flex;flex-direction:column;gap:8px;">
               <sc-for list="{{ newKeyTypes }}" as="t" hint-placeholder-count="3">
-                <button type="button" onClick="{{ t.select }}" style="display:flex;align-items:flex-start;gap:12px;text-align:left;padding:13px 15px;border:1px solid {{ t.border }};background:{{ t.bg }};border-radius:11px;cursor:pointer;"><span style="width:16px;height:16px;flex:none;margin-top:2px;border-radius:999px;border:2px solid {{ t.dot }};background:{{ t.dotFill }};box-shadow:{{ t.dotRing }};"></span><span style="min-width:0;"><strong style="display:block;font-size:13.5px;font-weight:500;color:var(--ink);">{{ t.type }} <code style="font-size:12px;color:var(--ink-3);font-weight:400;">{{ t.prefix }}</code></strong><span style="display:block;margin-top:3px;font-size:12.5px;line-height:1.5;color:var(--ink-2);">{{ t.use }}</span></span></button>
+                <button type="button" onClick="{{ t.select }}" aria-pressed="{{ t.pressed }}" style="display:flex;align-items:flex-start;gap:12px;text-align:left;padding:13px 15px;border:1px solid {{ t.border }};background:{{ t.bg }};border-radius:11px;cursor:pointer;"><span style="width:16px;height:16px;flex:none;margin-top:2px;border-radius:999px;border:2px solid {{ t.dot }};background:{{ t.dotFill }};box-shadow:{{ t.dotRing }};"></span><span style="min-width:0;"><strong style="display:block;font-size:13.5px;font-weight:500;color:var(--ink);">{{ t.type }} <code style="font-size:12px;color:var(--ink-3);font-weight:400;">{{ t.prefix }}</code></strong><span style="display:block;margin-top:3px;font-size:12.5px;line-height:1.5;color:var(--ink-2);">{{ t.use }}</span></span></button>
               </sc-for>
             </div>
           </fieldset>
@@ -1514,16 +1527,16 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
           <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);">Product<select style="height:42px;border:1px solid var(--line-2);border-radius:9px;padding:0 10px;font-size:13.5px;font-family:inherit;background:var(--surface);color:var(--ink);"><option>Ingeniux CMS</option><option>DiscoverCX CDP</option><option>AI Assists</option></select></label>
           <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);">Version<select style="height:42px;border:1px solid var(--line-2);border-radius:9px;padding:0 10px;font-size:13.5px;font-family:inherit;background:var(--surface);color:var(--ink);"><option>10.6</option><option>10.5</option><option>10.4</option></select></label>
         </div>
-        <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);margin-top:14px;">Environment<div style="display:flex;gap:8px;">
-          <sc-for list="{{ environments }}" as="ev" hint-placeholder-count="3"><button type="button" onClick="{{ ev.select }}" style="flex:1;height:38px;border:1px solid {{ ev.border }};background:{{ ev.bg }};color:{{ ev.color }};border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;">{{ ev.label }}</button></sc-for>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);margin-top:14px;">Environment<div role="group" aria-label="Environment" style="display:flex;gap:8px;">
+          <sc-for list="{{ environments }}" as="ev" hint-placeholder-count="3"><button type="button" onClick="{{ ev.select }}" aria-pressed="{{ ev.pressed }}" style="flex:1;height:38px;border:1px solid {{ ev.border }};background:{{ ev.bg }};color:{{ ev.color }};border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;">{{ ev.label }}</button></sc-for>
         </div></label>
       </fieldset>
 
       <fieldset aria-label="Impact" style="border:0;margin:0;padding:24px 26px;border-bottom:1px solid var(--line);">
         <p style="margin:0 0 14px;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);">Impact</p>
-        <div style="display:flex;flex-direction:column;gap:8px;">
+        <div role="group" aria-label="Impact" style="display:flex;flex-direction:column;gap:8px;">
           <sc-for list="{{ severities }}" as="sv" hint-placeholder-count="4">
-            <button type="button" onClick="{{ sv.select }}" style="display:flex;align-items:center;gap:14px;text-align:left;padding:12px 15px;border:1px solid {{ sv.border }};background:{{ sv.bg }};border-radius:10px;cursor:pointer;">
+            <button type="button" onClick="{{ sv.select }}" aria-pressed="{{ sv.pressed }}" style="display:flex;align-items:center;gap:14px;text-align:left;padding:12px 15px;border:1px solid {{ sv.border }};background:{{ sv.bg }};border-radius:10px;cursor:pointer;">
               <span style="width:15px;height:15px;flex:none;border-radius:999px;border:2px solid {{ sv.dot }};background:{{ sv.dotFill }};box-shadow:{{ sv.dotRing }};"></span>
               <span style="flex:1;min-width:0;"><strong style="display:block;font-size:13.5px;font-weight:500;color:var(--ink);">{{ sv.label }}</strong><span style="display:block;margin-top:2px;font-size:12px;color:var(--ink-2);">{{ sv.desc }}</span></span>
               <span style="font-size:11.5px;color:var(--ink-3);white-space:nowrap;">{{ sv.sla }}</span>
@@ -1534,7 +1547,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
 
       <fieldset aria-label="What happened" style="border:0;margin:0;padding:24px 26px;">
         <p style="margin:0 0 14px;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);">What happened</p>
-        <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);">Summary<input value="{{ caseSubject }}" onChange="{{ setSubject }}" placeholder="Publish to production times out after 40 minutes" style="height:42px;border:1px solid var(--line-2);border-radius:9px;padding:0 12px;font-size:13.5px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none;" style-focus="border-color:var(--accent);"></label>
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);">Summary<input value="{{ caseSubject }}" name="subject" required onChange="{{ setSubject }}" placeholder="Publish to production times out after 40 minutes" style="height:42px;border:1px solid var(--line-2);border-radius:9px;padding:0 12px;font-size:13.5px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none;" style-focus="border-color:var(--accent);"></label>
         <label style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--ink-2);margin-top:14px;">Details <span style="color:var(--ink-3);">steps to reproduce · expected vs. actual</span><textarea rows="6" value="{{ caseDesc }}" onChange="{{ setDesc }}" style="border:1px solid var(--line-2);border-radius:9px;padding:12px;font-size:13.5px;font-family:inherit;background:var(--surface);color:var(--ink);outline:none;resize:vertical;" style-focus="border-color:var(--accent);"></textarea></label>
         <div style="display:flex;align-items:center;gap:12px;margin-top:14px;padding:13px 16px;border:1px dashed var(--line-2);border-radius:9px;font-size:12.5px;color:var(--ink-3);"><i data-lucide="paperclip" style="width:15px;height:15px;flex:none;"></i>Drop screenshots or logs, or <a href="#">browse</a><span style="margin-left:auto;">Max 25 MB</span></div>
       </fieldset>
@@ -1639,7 +1652,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
     <p style="margin:0 0 26px;font-size:14.5px;line-height:1.6;color:var(--ink-2);">It may live in a different product version. Try a search, or let the assistant find the closest match.</p>
     <form onSubmit="{{ submitSearch }}" style="display:flex;align-items:center;gap:12px;height:54px;padding:0 8px 0 20px;border-radius:999px;background:var(--surface);border:1px solid var(--line-2);margin-bottom:18px;">
       <i data-lucide="search" style="color:var(--ink-3);flex:none;"></i>
-      <input value="{{ query }}" onChange="{{ setQuery }}" placeholder="Search the documentation" style="flex:1;min-width:0;border:0;background:none;outline:none;font-size:14.5px;color:var(--ink);font-family:inherit;">
+      <input value="{{ query }}" onChange="{{ setQuery }}" type="search" name="q" aria-label="Search the documentation" placeholder="Search the documentation" style="flex:1;min-width:0;border:0;background:none;outline:none;font-size:14.5px;color:var(--ink);font-family:inherit;">
       <button type="submit" style="height:42px;padding:0 20px;border:0;border-radius:999px;background:var(--deep);color:#fff;font-size:13.5px;font-weight:500;cursor:pointer;">Search</button>
     </form>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
@@ -1673,7 +1686,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
       <sc-for list="{{ allScreens }}" as="sc" hint-placeholder-count="11"><button onClick="{{ sc.go }}" style="background:{{ sc.bg }};color:{{ sc.color }};" style-hover="background:var(--field);">{{ sc.label }}</button></sc-for>
     </div>
   </sc-if>
-  <button onClick="{{ toggleDock }}" class="nav-dock__btn" aria-label="Switch screen, current: {{ screenLabel }}" title="Switch screen"><span></span><span class="nav-dock__label">{{ screenLabel }}</span></button>
+  <button onClick="{{ toggleDock }}" class="nav-dock__btn" aria-haspopup="true" aria-expanded="{{ dockExpanded }}" aria-label="Switch screen, current: {{ screenLabel }}" title="Switch screen"><span></span><span class="nav-dock__label">{{ screenLabel }}</span></button>
 </div>
 
 </div>
@@ -1691,9 +1704,87 @@ class Component extends DCLogic {
     sumVote: null, fbOpen: false, fbSent: false, activeToc: 'overview',
     facetOn: { 'Documentation': true, 'Ingeniux CMS': true, '10.6 (latest)': true }
   };
-  componentDidMount() { this.icons(); this.applyTheme(); this.motion(); }
-  componentDidUpdate() { this.icons(); this.applyTheme(); this.motion(); }
-  componentWillUnmount() { if (this._io) this._io.disconnect(); }
+  componentDidMount() { this.icons(); this.applyTheme(); this.motion(); this.keys(); this.a11y(); }
+  componentDidUpdate() { this.icons(); this.applyTheme(); this.motion(); this.a11y(); }
+  componentWillUnmount() {
+    if (this._io) this._io.disconnect();
+    if (this._keys) { document.removeEventListener('keydown', this._keys); this._keys = null; }
+  }
+
+  /* ── accessibility wiring ───────────────────────────────────────────
+     Three things this template cannot express declaratively.
+
+     1. The card chassis renders `<a onClick>` with no href — 50 of the
+        83 anchors in the file — so the primary content of nearly every
+        screen was mouse-only. role=link + tabindex makes each one
+        reachable and Enter activates it. Real hrefs emitted by the CMS
+        are the durable fix; this keeps the prototype operable until
+        then, and it is the contract the templates must honour.
+     2. The four role="dialog" overlays had no focus management at all:
+        focus stayed behind the overlay, Tab walked the page underneath,
+        Escape did nothing, and closing dropped focus to <body>.
+     3. The mounted <main> carries the id the skip link targets. Only
+        one <main> is mounted at a time, so the id stays unique. */
+  a11y() {
+    const m = document.querySelector('main');
+    if (m && m.id !== 'main') m.id = 'main';
+
+    document.querySelectorAll('a:not([href]):not([role])').forEach(a => {
+      a.setAttribute('role', 'link');
+      a.setAttribute('tabindex', '0');
+    });
+
+    const dlg = document.querySelector('[role="dialog"]');
+    if (dlg && this._dlg !== dlg) {
+      if (!this._dlg) this._lastFocus = document.activeElement;
+      this._dlg = dlg;
+      dlg.setAttribute('tabindex', '-1');
+      /* querySelector returns document order, not selector order, so ask
+         for fields first — otherwise focus lands on the header close
+         button that precedes them and the form reads as empty chrome. */
+      const field = dlg.querySelector('input:not([type=hidden]),select,textarea');
+      const first = field || dlg.querySelector('button:not([disabled]),a[href],[tabindex="0"]');
+      (first || dlg).focus();
+    } else if (!dlg && this._dlg) {
+      this._dlg = null;
+      const back = this._lastFocus;
+      this._lastFocus = null;
+      if (back && back.focus && document.contains(back)) back.focus();
+    }
+  }
+
+  /* Escape closes the topmost layer. Ordered by z-index so a dialog
+     over a sheet closes the dialog first. */
+  closeTop() {
+    const s = this.state;
+    if (s.pgOpen) return this.setState({ pgOpen: false });
+    if (s.keyModal) return this.setState({ keyModal: false });
+    if (s.fbOpen) return this.setState({ fbOpen: false });
+    if (s.filtersOpen) return this.setState({ filtersOpen: false });
+    if (s.menuOpen) return this.setState({ menuOpen: false });
+    if (s.dockOpen) return this.setState({ dockOpen: false });
+  }
+
+  keys() {
+    if (this._keys) return;
+    this._keys = (e) => {
+      if (e.key === 'Escape') { this.closeTop(); return; }
+      if (e.key === 'Enter') {
+        const t = e.target;
+        if (t && t.getAttribute && t.getAttribute('role') === 'link') { e.preventDefault(); t.click(); }
+        return;
+      }
+      if (e.key !== 'Tab' || !this._dlg) return;
+      const f = [...this._dlg.querySelectorAll(
+        'a[href],button:not([disabled]),input:not([type=hidden]),select,textarea,[tabindex="0"]'
+      )].filter(el => el.offsetWidth || el.offsetHeight);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+    document.addEventListener('keydown', this._keys);
+  }
   /* Declarative entrance layer. Marks html.js so the hidden state only ever
      applies when this script is alive, then reveals each [data-motion] once. */
   motion() {
@@ -2072,7 +2163,7 @@ By default, new web pages can be created anywhere in the Site Tree.
       newKeyName: s.newKeyName, setKeyName: (e) => this.setState({ newKeyName: e.target.value }),
       newKeyTypes: keyTypes.map(k => {
         const on = k.type === s.newKeyType;
-        return { ...k, select: () => this.setState({ newKeyType: k.type }), border: on ? 'var(--accent)' : 'var(--line-2)', bg: on ? 'var(--accent-soft)' : 'var(--surface)', dot: on ? 'var(--accent)' : 'var(--line-2)', dotFill: on ? 'var(--accent)' : 'transparent', dotRing: on ? 'inset 0 0 0 2px var(--surface)' : 'none' };
+        return { ...k, pressed: on ? 'true' : 'false', select: () => this.setState({ newKeyType: k.type }), border: on ? 'var(--accent)' : 'var(--line-2)', bg: on ? 'var(--accent-soft)' : 'var(--surface)', dot: on ? 'var(--accent)' : 'var(--line-2)', dotFill: on ? 'var(--accent)' : 'transparent', dotRing: on ? 'inset 0 0 0 2px var(--surface)' : 'none' };
       }),
       newKeyValue: (keyTypes.find(k => k.type === s.newKeyType) || keyTypes[0]).prefix + 'x7QvR2bT9mKd4LpZ8sNw',
       copyKeyLabel: s.keyCopied ? 'Copied' : 'Copy',
@@ -2111,6 +2202,9 @@ By default, new web pages can be created anywhere in the Site Tree.
       goSignin: () => this.go('signin'), goProfile: () => this.go('profile'), goApi: () => this.go('api'), goChangelog: () => this.go('changelog'), goContact: () => this.go('contact'), goNotFound: () => this.go('notfound'),
       signIn: (e) => { e.preventDefault(); this.go('home'); },
       dockOpen: s.dockOpen, dockClass: s.dockOpen ? 'is-open' : '', toggleDock: () => this.setState({ dockOpen: !s.dockOpen }),
+      /* aria-expanded as strings: every disclosure trigger in the file
+         was silent about its open state to assistive tech. */
+      dockExpanded: s.dockOpen ? 'true' : 'false',
       screenLabel: (allScreens.find(x => x[0] === s.screen) || [, 'Screen'])[1].toUpperCase(),
       allScreens: allScreens.map(([k, label]) => ({ label, go: () => this.go(k), bg: k === s.screen ? 'var(--accent-soft)' : 'transparent', color: k === s.screen ? 'var(--accent)' : 'var(--ink)' })),
       ssoProviders: [{ icon: 'chrome', label: 'Continue with Google' }, { icon: 'square', label: 'Continue with Microsoft' }, { icon: 'key-round', label: 'Continue with SAML SSO' }],
@@ -2168,11 +2262,11 @@ By default, new web pages can be created anywhere in the Site Tree.
         ['Sev-1', 'Production down or data at risk', 'One hour, 24×7']
       ].map(([label, desc, sla]) => {
         const on = label === s.severity;
-        return { label, desc, sla, select: () => this.setState({ severity: label }), border: on ? 'var(--accent)' : 'var(--line-2)', bg: on ? 'var(--accent-soft)' : 'var(--surface)', dot: on ? 'var(--accent)' : 'var(--line-2)', dotFill: on ? 'var(--accent)' : 'transparent', dotRing: on ? 'inset 0 0 0 2px var(--surface)' : 'none' };
+        return { pressed: on ? 'true' : 'false', label, desc, sla, select: () => this.setState({ severity: label }), border: on ? 'var(--accent)' : 'var(--line-2)', bg: on ? 'var(--accent-soft)' : 'var(--surface)', dot: on ? 'var(--accent)' : 'var(--line-2)', dotFill: on ? 'var(--accent)' : 'transparent', dotRing: on ? 'inset 0 0 0 2px var(--surface)' : 'none' };
       }),
       environments: ['Production', 'Staging', 'Sandbox'].map(label => {
         const on = label === s.environment;
-        return { label, select: () => this.setState({ environment: label }), border: on ? 'var(--accent)' : 'var(--line-2)', bg: on ? 'var(--accent-soft)' : 'var(--surface)', color: on ? 'var(--accent)' : 'var(--ink)' };
+        return { pressed: on ? 'true' : 'false', label, select: () => this.setState({ environment: label }), border: on ? 'var(--accent)' : 'var(--line-2)', bg: on ? 'var(--accent-soft)' : 'var(--surface)', color: on ? 'var(--accent)' : 'var(--ink)' };
       }),
       deflectLive: s.deflectState === 'searching' || s.deflectState === 'found',
       deflectCount: s.deflectState === 'found' ? match.sources.length + ' found' : '',
@@ -2220,6 +2314,7 @@ By default, new web pages can be created anywhere in the Site Tree.
       query: s.query, setQuery: (e) => this.setState({ query: e.target.value }), clearQuery: () => this.setState({ query: '' }),
       submitSearch: (e) => { e.preventDefault(); this.go('search'); },
       filtersOpen: s.filtersOpen, toggleFilters: () => this.setState({ filtersOpen: !s.filtersOpen }),
+      filtersExpanded: s.filtersOpen ? 'true' : 'false',
       clearFilters: () => this.setState({ facetOn: {} }),
       hasFilters: activeFacets.length > 0, filterCount: activeFacets.length,
       filterSummary: activeFacets.length ? activeFacets.join(', ') : 'nothing',
@@ -2247,6 +2342,7 @@ By default, new web pages can be created anywhere in the Site Tree.
       copyLabel: s.copied ? 'Copied' : 'Copy page',
       copyPage: () => { this.setState({ copied: true }); this.flash('Page copied as Markdown'); setTimeout(() => this.setState({ copied: false }), 1600); },
       menuOpen: s.menuOpen, toggleMenu: () => this.setState({ menuOpen: !s.menuOpen }),
+      menuExpanded: s.menuOpen ? 'true' : 'false',
       copyMenu: [
         { icon: 'copy', title: 'Copy page', sub: 'Copy page as Markdown for LLMs', href: '', extra: '', action: () => { this.setState({ menuOpen: false }); this.flash('Page copied as Markdown'); } },
         { icon: 'message-circle', title: 'Open in ChatGPT ↗', sub: 'Ask questions about this page', href: 'https://chat.openai.com/?q=' + encodeURIComponent('Read https://docs.example.com/cms10/authoring/creating-pages.md'), extra: '', action: () => this.setState({ menuOpen: false }) },
