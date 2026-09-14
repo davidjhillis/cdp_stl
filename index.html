@@ -170,15 +170,17 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
    .doc-grid--reader so the API index keeps the 12-column grid. */
 .doc-grid--reader{max-width:1600px;grid-template-columns:282px minmax(0,1fr) 282px;}
 .doc-grid--reader > .doc-nav,.doc-grid--reader > .doc-main,.doc-grid--reader > .doc-rail{grid-column:auto !important;}
-.doc-grid--reader.is-collapsed{grid-template-columns:minmax(0,1fr) 282px;}
+.doc-grid--reader.is-collapsed{grid-template-columns:44px minmax(0,1fr) 282px;}
+.doc-grid--reader.is-collapsed .doc-nav{display:block;}
 .doc-grid--reader.rail-closed{grid-template-columns:282px minmax(0,1fr) 44px;}
-.doc-grid--reader.is-collapsed.rail-closed{grid-template-columns:minmax(0,1fr) 44px;}
+.doc-grid--reader.is-collapsed.rail-closed{grid-template-columns:44px minmax(0,1fr) 44px;}
 .doc-grid--reader.rail-hidden{grid-template-columns:282px minmax(0,1fr);}
-.doc-grid--reader.is-collapsed.rail-hidden{grid-template-columns:minmax(0,1fr);}
-@media (max-width:1180px){.doc-grid--reader,.doc-grid--reader.rail-closed,.doc-grid--reader.rail-hidden{grid-template-columns:282px minmax(0,1fr);}.doc-grid--reader.is-collapsed,.doc-grid--reader.is-collapsed.rail-closed,.doc-grid--reader.is-collapsed.rail-hidden{grid-template-columns:minmax(0,1fr);}}
-@media (max-width:900px){.doc-grid--reader,.doc-grid--reader.is-collapsed,.doc-grid--reader.rail-closed,.doc-grid--reader.rail-hidden,.doc-grid--reader.is-collapsed.rail-closed,.doc-grid--reader.is-collapsed.rail-hidden{grid-template-columns:minmax(0,1fr);}}
+.doc-grid--reader.is-collapsed.rail-hidden{grid-template-columns:44px minmax(0,1fr);}
+@media (max-width:1180px){.doc-grid--reader,.doc-grid--reader.rail-closed,.doc-grid--reader.rail-hidden{grid-template-columns:282px minmax(0,1fr);}.doc-grid--reader.is-collapsed,.doc-grid--reader.is-collapsed.rail-closed,.doc-grid--reader.is-collapsed.rail-hidden{grid-template-columns:44px minmax(0,1fr);}}
+@media (max-width:900px){.doc-grid--reader.is-collapsed .doc-nav{display:none;}.doc-grid--reader,.doc-grid--reader.is-collapsed,.doc-grid--reader.rail-closed,.doc-grid--reader.rail-hidden,.doc-grid--reader.is-collapsed.rail-closed,.doc-grid--reader.is-collapsed.rail-hidden{grid-template-columns:minmax(0,1fr);}}
 .doc-grid--reader .prose > :where(p,ul,ol,h2,h3,h4,blockquote,.callout){max-width:72ch;}
-.rail-head{display:flex;justify-content:flex-end;margin-bottom:-12px;}
+.rail-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px;margin:0 0 8px;}
+.rail-head__label{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .rail-toggle{width:36px;height:36px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink-2);cursor:pointer;display:grid;place-items:center;flex:none;transition:background var(--dur-fast) ease,color var(--dur-fast) ease;}
 .rail-toggle:hover{background:var(--field);color:var(--ink);}
 .rail-toggle svg{width:17px;height:17px;}
@@ -584,11 +586,17 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
   </div>
 
   <div class="doc-grid doc-grid--reader {{ collapsedClass }} {{ railClass }}">
-    <aside class="doc-nav">
+    <aside class="doc-nav" aria-label="Section contents">
+      <sc-if value="{{ navCollapsed }}" hint-placeholder-val="{{ false }}">
+      <div class="doc-sticky rail-strip">
+        <button data-nav-open class="rail-toggle tip" data-tip="Show contents" onClick="{{ expandNav }}" aria-expanded="false" aria-label="Show contents"><i data-lucide="panel-left-open"></i></button>
+      </div>
+      </sc-if>
+      <sc-if value="{{ navOpen }}" hint-placeholder-val="{{ true }}">
       <div class="doc-sticky">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 8px 8px;">
-          <span style="font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);">Ingeniux CMS</span>
-          <button onClick="{{ collapseNav }}" title="Collapse contents" aria-label="Collapse contents" style="border:0;background:none;color:var(--ink-3);cursor:pointer;padding:4px;border-radius:6px;display:grid;place-items:center;" style-hover="color:var(--accent);"><i data-lucide="panel-left-close" style="width:16px;height:16px;"></i></button>
+        <div class="rail-head" style="padding-left:8px;">
+          <span class="rail-head__label">Ingeniux CMS</span>
+          <button data-nav-close class="rail-toggle tip" data-tip="Collapse contents" onClick="{{ collapseNav }}" aria-expanded="true" aria-label="Collapse contents"><i data-lucide="panel-left-close"></i></button>
         </div>
         <sc-for list="{{ docTree }}" as="g" hint-placeholder-count="6">
           <div class="doc-nav__group">
@@ -601,12 +609,10 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
           </div>
         </sc-for>
       </div>
+      </sc-if>
     </aside>
 
     <main data-motion="fade-up" class="doc-main">
-      <sc-if value="{{ navCollapsed }}" hint-placeholder-val="{{ false }}">
-        <button onClick="{{ expandNav }}" style="display:inline-flex;align-items:center;gap:7px;margin-bottom:18px;border:0;background:none;color:var(--accent);font-size:13px;font-weight:500;cursor:pointer;padding:0;"><i data-lucide="panel-left-open" style="width:16px;height:16px;"></i>Show contents</button>
-      </sc-if>
       <p style="margin:0 0 10px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:600;">Ingeniux CMS · Authoring Basics</p>
       <h1 style="margin:0 0 14px;font-size:33px;line-height:1.14;letter-spacing:-.024em;font-weight:500;">Creating Pages with Visual Editing</h1>
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;font-size:12.5px;color:var(--ink-3);padding-bottom:20px;border-bottom:1px solid var(--line);">
@@ -726,15 +732,17 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
       </sc-if>
       <sc-if value="{{ railOpen }}" hint-placeholder-val="{{ true }}">
       <div class="doc-sticky" style="display:flex;flex-direction:column;gap:20px;">
-        <div class="rail-head">
+        <div>
+        <div class="rail-head" style="padding-left:14px;">
+          <span id="reader-otp-label" class="rail-head__label">On this page</span>
           <button data-rail-close class="rail-toggle tip tip--end" data-tip="Close page tools" onClick="{{ closeRail }}" aria-expanded="true" aria-label="Close page tools"><i data-lucide="panel-right-close"></i></button>
         </div>
-        <nav aria-label="On this page">
-          <p style="margin:0 0 8px;padding-left:14px;font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);">On this page</p>
+        <nav aria-labelledby="reader-otp-label">
           <div class="toc" style="border-left:1px solid var(--line-2);">
             <sc-for list="{{ toc }}" as="t" hint-placeholder-count="6"><a href="{{ t.href }}" aria-current="{{ t.current }}">{{ t.label }}</a></sc-for>
           </div>
         </nav>
+        </div>
         <div class="widget">
           <h3>Article details</h3>
           <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;color:var(--ink-2);">
@@ -1781,6 +1789,12 @@ class Component extends DCLogic {
     this.setState({ railPref: v });
     setTimeout(() => { const t = document.querySelector(v === 'open' ? '[data-rail-close]' : '[data-rail-open]'); if (t) t.focus(); }, 0);
   }
+  /* Collapse or expand the section contents. Same control and focus
+     handling as the right rail, so both sides behave alike. */
+  setNav(collapsed) {
+    this.setState({ navCollapsed: collapsed });
+    setTimeout(() => { const t = document.querySelector(collapsed ? '[data-nav-open]' : '[data-nav-close]'); if (t) t.focus(); }, 0);
+  }
   /* Preview of the per-article publish option. Clears the remembered
      choice so the option's own starting state is what you see. */
   setRailSetting(k) {
@@ -2449,8 +2463,9 @@ By default, new web pages can be created anywhere in the Site Tree.
       openRail: () => this.setRail('open'), closeRail: () => this.setRail('closed'),
       chromeMax: is('article') ? '1600px' : '1240px',
       railSettings: [['show', 'Show'], ['closed', 'Start closed'], ['hidden', 'Hide']].map(([k, label]) => ({ label, pressed: k === railSetting ? 'true' : 'false', bg: k === railSetting ? 'var(--accent-soft)' : 'transparent', color: k === railSetting ? 'var(--accent)' : 'var(--ink)', pick: () => this.setRailSetting(k) })),
-      collapseNav: () => this.setState({ navCollapsed: true }),
-      expandNav: () => this.setState({ navCollapsed: false }),
+      navOpen: !s.navCollapsed,
+      collapseNav: () => this.setNav(true),
+      expandNav: () => this.setNav(false),
       docTree: [
         { title: 'Getting Started', open: false, items: [] },
         { title: 'Authoring Basics', open: true, items: [
