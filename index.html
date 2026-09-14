@@ -165,8 +165,10 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
    fixed 282px rails, a fluid article column (596px at 1280, ~916px at
    1600). Prose keeps a readable measure; tables, code and figures use the
    full column. The right rail (page tools) can be closed to a 44px strip
-   and reopened; the reader's choice is remembered. Per-article setting:
-   Show / Start closed / Hide (previewed from the screen dock). Scoped to
+   and reopened, and so can the section contents; each side remembers the
+   reader's choice. Both start open. A page the CMS renders with
+   data-reader-layout="wide" starts with both closed. Right rail article
+   setting: Show / Start closed / Hide. Both previewed from the screen dock. Scoped to
    .doc-grid--reader so the API index keeps the 12-column grid. */
 .doc-grid--reader{max-width:1600px;grid-template-columns:282px minmax(0,1fr) 282px;}
 .doc-grid--reader > .doc-nav,.doc-grid--reader > .doc-main,.doc-grid--reader > .doc-rail{grid-column:auto !important;}
@@ -195,6 +197,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
 .nav-dock__setting{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;margin-top:6px;padding-top:8px;border-top:1px solid var(--line);}
 .nav-dock__setting > span{grid-column:1/-1;padding:0 12px 4px;font-size:11.5px;color:var(--ink-3);}
 .nav-dock__setting button{text-align:center !important;}
+.nav-dock__setting--two{grid-template-columns:repeat(2,minmax(0,1fr));}
 .doc-sticky{position:sticky;top:132px;max-height:calc(100vh - 152px);min-width:0;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:stable;scrollbar-width:thin;padding-bottom:12px;}
 .doc-sticky::-webkit-scrollbar{width:8px;}
 .doc-sticky::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:999px;}
@@ -585,7 +588,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
     </div>
   </div>
 
-  <div class="doc-grid doc-grid--reader {{ collapsedClass }} {{ railClass }}">
+  <div class="doc-grid doc-grid--reader {{ collapsedClass }} {{ railClass }}" data-reader-layout="{{ readerLayout }}">
     <aside class="doc-nav" aria-label="Section contents">
       <sc-if value="{{ navCollapsed }}" hint-placeholder-val="{{ false }}">
       <div class="doc-sticky rail-strip">
@@ -1750,6 +1753,10 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
     <div class="nav-dock__panel">
       <sc-for list="{{ allScreens }}" as="sc" hint-placeholder-count="11"><button onClick="{{ sc.go }}" style="background:{{ sc.bg }};color:{{ sc.color }};" style-hover="background:var(--field);">{{ sc.label }}</button></sc-for>
       <sc-if value="{{ isArticle }}" hint-placeholder-val="{{ false }}">
+        <div class="nav-dock__setting nav-dock__setting--two" role="group" aria-label="Page layout, article setting">
+          <span>Page layout · article setting (Wide starts both panels closed)</span>
+          <sc-for list="{{ layoutSettings }}" as="ls" hint-placeholder-count="2"><button onClick="{{ ls.pick }}" aria-pressed="{{ ls.pressed }}" style="background:{{ ls.bg }};color:{{ ls.color }};" style-hover="background:var(--field);">{{ ls.label }}</button></sc-for>
+        </div>
         <div class="nav-dock__setting" role="group" aria-label="Right rail, article setting">
           <span>Right rail · article setting</span>
           <sc-for list="{{ railSettings }}" as="rs" hint-placeholder-count="3"><button onClick="{{ rs.pick }}" aria-pressed="{{ rs.pressed }}" style="background:{{ rs.bg }};color:{{ rs.color }};" style-hover="background:var(--field);">{{ rs.label }}</button></sc-for>
@@ -1762,7 +1769,7 @@ html.no-motion .hub-card:hover,html.no-motion .hub-tile:hover{transform:none;}
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;options&quot;:[&quot;#2F5D50&quot;,&quot;#1E4587&quot;,&quot;#7A4A2B&quot;,&quot;#3A213A&quot;],&quot;default&quot;:&quot;#2F5D50&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;comfortable&quot;,&quot;compact&quot;],&quot;default&quot;:&quot;comfortable&quot;,&quot;tsType&quot;:&quot;'comfortable' | 'compact'&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;heroCurve&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;pronounced&quot;,&quot;subtle&quot;,&quot;squared&quot;,&quot;pill&quot;],&quot;default&quot;:&quot;pronounced&quot;,&quot;tsType&quot;:&quot;'pronounced' | 'subtle' | 'squared' | 'pill'&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;groupLabel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Solution&quot;,&quot;Category&quot;,&quot;Topic&quot;,&quot;Collection&quot;,&quot;Experience&quot;],&quot;default&quot;:&quot;Solution&quot;,&quot;tsType&quot;:&quot;'Solution' | 'Category' | 'Topic' | 'Collection' | 'Experience'&quot;,&quot;section&quot;:&quot;Taxonomy&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;expressive&quot;,&quot;standard&quot;,&quot;minimal&quot;,&quot;none&quot;],&quot;default&quot;:&quot;standard&quot;,&quot;tsType&quot;:&quot;'expressive' | 'standard' | 'minimal' | 'none'&quot;,&quot;section&quot;:&quot;Motion &amp; depth&quot;},&quot;elevation&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;flat&quot;,&quot;soft&quot;,&quot;lifted&quot;],&quot;default&quot;:&quot;soft&quot;,&quot;tsType&quot;:&quot;'flat' | 'soft' | 'lifted'&quot;,&quot;section&quot;:&quot;Motion &amp; depth&quot;},&quot;readerRail&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;show&quot;,&quot;closed&quot;,&quot;hidden&quot;],&quot;default&quot;:&quot;show&quot;,&quot;tsType&quot;:&quot;'show' | 'closed' | 'hidden'&quot;,&quot;section&quot;:&quot;Reader&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;options&quot;:[&quot;#2F5D50&quot;,&quot;#1E4587&quot;,&quot;#7A4A2B&quot;,&quot;#3A213A&quot;],&quot;default&quot;:&quot;#2F5D50&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;comfortable&quot;,&quot;compact&quot;],&quot;default&quot;:&quot;comfortable&quot;,&quot;tsType&quot;:&quot;'comfortable' | 'compact'&quot;,&quot;section&quot;:&quot;Theme&quot;},&quot;heroCurve&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;pronounced&quot;,&quot;subtle&quot;,&quot;squared&quot;,&quot;pill&quot;],&quot;default&quot;:&quot;pronounced&quot;,&quot;tsType&quot;:&quot;'pronounced' | 'subtle' | 'squared' | 'pill'&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;groupLabel&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Solution&quot;,&quot;Category&quot;,&quot;Topic&quot;,&quot;Collection&quot;,&quot;Experience&quot;],&quot;default&quot;:&quot;Solution&quot;,&quot;tsType&quot;:&quot;'Solution' | 'Category' | 'Topic' | 'Collection' | 'Experience'&quot;,&quot;section&quot;:&quot;Taxonomy&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;expressive&quot;,&quot;standard&quot;,&quot;minimal&quot;,&quot;none&quot;],&quot;default&quot;:&quot;standard&quot;,&quot;tsType&quot;:&quot;'expressive' | 'standard' | 'minimal' | 'none'&quot;,&quot;section&quot;:&quot;Motion &amp; depth&quot;},&quot;elevation&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;flat&quot;,&quot;soft&quot;,&quot;lifted&quot;],&quot;default&quot;:&quot;soft&quot;,&quot;tsType&quot;:&quot;'flat' | 'soft' | 'lifted'&quot;,&quot;section&quot;:&quot;Motion &amp; depth&quot;},&quot;readerRail&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;show&quot;,&quot;closed&quot;,&quot;hidden&quot;],&quot;default&quot;:&quot;show&quot;,&quot;tsType&quot;:&quot;'show' | 'closed' | 'hidden'&quot;,&quot;section&quot;:&quot;Reader&quot;},&quot;readerLayout&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;standard&quot;,&quot;wide&quot;],&quot;default&quot;:&quot;standard&quot;,&quot;tsType&quot;:&quot;'standard' | 'wide'&quot;,&quot;section&quot;:&quot;Reader&quot;}}">
 class Component extends DCLogic {
   state = {
     screen: 'home', query: 'component schemas', filtersOpen: false, menuOpen: false,
@@ -1771,35 +1778,57 @@ class Component extends DCLogic {
     caseSubject: '', caseDesc: '', deflectState: 'idle', caseOutcome: null, environment: 'Production',
     pgOpen: false, pgSent: false, pgSending: false, pgEndpoint: 'createPage', pgValues: {},
     keyModal: false, keyStage: 'form', newKeyName: '', newKeyType: 'Admin key', keyCopied: false,
-    navCollapsed: false, version: '10.6', summaryOpen: false, listening: false, mdView: false,
-    sumVote: null, fbOpen: false, fbSent: false, activeToc: 'overview', railPref: null, railSetting: null,
+    version: '10.6', summaryOpen: false, listening: false, mdView: false,
+    sumVote: null, fbOpen: false, fbSent: false, activeToc: 'overview', railPref: null, railSetting: null, navPref: null, layoutSetting: null, wideNav: false, wideRail: false,
     facetOn: { 'Documentation': true, 'Ingeniux CMS': true, '10.6 (latest)': true }
   };
   componentDidMount() {
     this.icons(); this.applyTheme(); this.motion(); this.keys(); this.a11y();
-    let pref = null;
-    try { pref = window.localStorage.getItem('cdp.reader.rail'); } catch (e) { pref = null; }
-    if (pref === 'open' || pref === 'closed') this.setState({ railPref: pref });
+    const read = (key) => { try { const v = window.localStorage.getItem(key); return v === 'open' || v === 'closed' ? v : null; } catch (e) { return null; } };
+    this.setState({ railPref: read('cdp.reader.rail'), navPref: read('cdp.reader.nav') });
   }
-  /* Close or open the Reader's right rail and remember the choice across
-     articles. Focus moves to the control that replaces the one pressed, so
-     keyboard users are not dropped to the top of the page. */
+  /* READER PANELS - how the section contents (left) and page tools (right)
+     decide whether they start open.
+     - Default: both OPEN.
+     - The reader's choice is remembered across articles, per side
+       (localStorage cdp.reader.nav / cdp.reader.rail), and applies on every
+       standard article.
+     - A page the CMS renders as wide (data-reader-layout="wide", from the
+       article's Page layout setting - a new STL 2.0 field an author sets on
+       an article with wide tables) starts with BOTH panels closed,
+       whatever was remembered: its content needs the width. The reader can
+       still open either panel there; that choice lasts for the page view and
+       does not change what is remembered for standard articles.
+     - The right rail's article setting Hide removes it on any page.
+     Focus moves to the control that replaces the one pressed. */
+  isWidePage() { return (this.state.layoutSetting || this.props.readerLayout || 'standard') === 'wide'; }
   setRail(v) {
-    try { window.localStorage.setItem('cdp.reader.rail', v); } catch (e) { /* storage blocked: the choice lasts for this view */ }
-    this.setState({ railPref: v });
+    if (this.isWidePage()) { this.setState({ wideRail: v === 'open' }); }
+    else {
+      try { window.localStorage.setItem('cdp.reader.rail', v); } catch (e) { /* storage blocked: the choice lasts for this view */ }
+      this.setState({ railPref: v });
+    }
     setTimeout(() => { const t = document.querySelector(v === 'open' ? '[data-rail-close]' : '[data-rail-open]'); if (t) t.focus(); }, 0);
   }
-  /* Collapse or expand the section contents. Same control and focus
-     handling as the right rail, so both sides behave alike. */
   setNav(collapsed) {
-    this.setState({ navCollapsed: collapsed });
+    if (this.isWidePage()) { this.setState({ wideNav: !collapsed }); }
+    else {
+      const v = collapsed ? 'closed' : 'open';
+      try { window.localStorage.setItem('cdp.reader.nav', v); } catch (e) { /* storage blocked: the choice lasts for this view */ }
+      this.setState({ navPref: v });
+    }
     setTimeout(() => { const t = document.querySelector(collapsed ? '[data-nav-open]' : '[data-nav-close]'); if (t) t.focus(); }, 0);
   }
-  /* Preview of the per-article publish option. Clears the remembered
-     choice so the option's own starting state is what you see. */
+  /* Preview of the right rail's article setting. Clears the remembered
+     right-rail choice so the setting's own starting state is what you see. */
   setRailSetting(k) {
     try { window.localStorage.removeItem('cdp.reader.rail'); } catch (e) { /* ignore */ }
-    this.setState({ railSetting: k, railPref: null });
+    this.setState({ railSetting: k, railPref: null, wideRail: false });
+  }
+  /* Preview of the CMS page-layout flag. Leaves remembered choices alone:
+     switching back to Standard shows them again. */
+  setLayoutSetting(k) {
+    this.setState({ layoutSetting: k, wideNav: false, wideRail: false });
   }
   componentDidUpdate() { this.icons(); this.applyTheme(); this.motion(); this.a11y(); }
   componentWillUnmount() {
@@ -2052,7 +2081,10 @@ By default, new web pages can be created anywhere in the Site Tree.
   renderVals() {
     const s = this.state, is = (k) => s.screen === k;
     const railSetting = s.railSetting || this.props.readerRail || 'show';
-    const railOpen = railSetting !== 'hidden' && (s.railPref ? s.railPref === 'open' : railSetting !== 'closed');
+    const readerLayout = s.layoutSetting || this.props.readerLayout || 'standard';
+    const widePage = readerLayout === 'wide';
+    const railOpen = railSetting !== 'hidden' && (widePage ? s.wideRail : (s.railPref ? s.railPref === 'open' : railSetting !== 'closed'));
+    const navCollapsed = widePage ? !s.wideNav : s.navPref === 'closed';
     const facetDef = [
       { title: 'Content type', options: [['Documentation', 128], ['Tutorials', 34], ['API reference', 143], ['Release notes', 62]] },
       { title: 'Product', options: [['Ingeniux CMS', 1240], ['DiscoverCX CDP', 386], ['AI Assists', 94]] },
@@ -2454,7 +2486,7 @@ By default, new web pages can be created anywhere in the Site Tree.
         { kind: 'Reference', title: 'POST /api/v1/pages' },
         { kind: 'Guide', title: 'Choosing a schema' }
       ],
-      navCollapsed: s.navCollapsed, collapsedClass: s.navCollapsed ? 'is-collapsed' : '',
+      navCollapsed: navCollapsed, collapsedClass: navCollapsed ? 'is-collapsed' : '', readerLayout: readerLayout,
       /* Reader right rail. railSetting = the article's publish option
          (Show / Start closed / Hide); railPref = the reader's remembered
          choice, which overrides Show and Start closed but never Hide. */
@@ -2463,7 +2495,8 @@ By default, new web pages can be created anywhere in the Site Tree.
       openRail: () => this.setRail('open'), closeRail: () => this.setRail('closed'),
       chromeMax: is('article') ? '1600px' : '1240px',
       railSettings: [['show', 'Show'], ['closed', 'Start closed'], ['hidden', 'Hide']].map(([k, label]) => ({ label, pressed: k === railSetting ? 'true' : 'false', bg: k === railSetting ? 'var(--accent-soft)' : 'transparent', color: k === railSetting ? 'var(--accent)' : 'var(--ink)', pick: () => this.setRailSetting(k) })),
-      navOpen: !s.navCollapsed,
+      navOpen: !navCollapsed,
+      layoutSettings: [['standard', 'Standard'], ['wide', 'Wide']].map(([k, label]) => ({ label, pressed: k === readerLayout ? 'true' : 'false', bg: k === readerLayout ? 'var(--accent-soft)' : 'transparent', color: k === readerLayout ? 'var(--accent)' : 'var(--ink)', pick: () => this.setLayoutSetting(k) })),
       collapseNav: () => this.setNav(true),
       expandNav: () => this.setNav(false),
       docTree: [
